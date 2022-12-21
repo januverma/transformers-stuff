@@ -97,7 +97,7 @@ class TransformerLayer(nn.Module):
         self.ffn_layer = FeedForward(hidden_dim, hidden_dim, dropout=ffn_dropout)
         self.layer_norm = TransformerLayerNorm(hidden_dim)
     def forward(self, x, key_padding_mask=None, attention_mask=None):
-        attn_out, attn_weights = self.attn_layer(x, key_padding_mask=None, attention_mask=None)
+        attn_out, attn_weights = self.attn_layer(x, key_padding_mask, attention_mask)
         x = self.layer_norm(x + attn_out)
         ffn_out = self.ffn_layer(x)
         x = self.layer_norm(x + ffn_out)
@@ -121,7 +121,7 @@ class TransformerEncoder(nn.Module):
         self.attn_weights = []
     def forward(self, x, key_padding_mask=None, attention_mask=None):
         for layer in self.layers:
-            x, weights = layer(x, key_padding_mask=None, attention_mask=None)
+            x, weights = layer(x, key_padding_mask, attention_mask)
             self.attn_weights.append(weights)
         return x
     def get_attention_weights(self):
